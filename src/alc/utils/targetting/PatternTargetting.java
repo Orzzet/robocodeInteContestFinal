@@ -19,9 +19,8 @@ public class PatternTargetting {
 	/**
 	 * precision -> número de movimientos a tener en cuenta en el patrón
 	 */
-	public static Point2D.Double patternTargeting(Robot myRobot, double bulletVelocity, int precision,
-			ScannedRobotEvent e, double enemyX, double enemyY, double[][] enemyPastMovements,
-			int enemyPastMovementsIndex) {
+	public static Point2D.Double pattern(Robot myRobot, double bulletVelocity, int precision, ScannedRobotEvent e,
+			double enemyX, double enemyY, double[][] enemyPastMovements, int enemyPastMovementsIndex) {
 
 		pastMovements = enemyPastMovements;
 		pastMovementsIndex = enemyPastMovementsIndex;
@@ -29,10 +28,15 @@ public class PatternTargetting {
 		minDifferenceValue = 1000000;
 		predictionBeginIndex = 0;
 
+		// Guarda los últimos movimientos que ha realizado el robot enemigo
 		recentMovements = saveRecentMovements(precision);
 
+		// Compara los últimos movimientos con los realizados durante la partida
+		// y devuelve el índice a partir del cual va a realizar los nuevos
+		// movimientos
 		predictionBeginIndex = fetchSimilarPatron(precision);
 
+		// Predice el punto en el que va a estar el enemigo teniendo en cuenta la velocidad de la bala
 		Point2D.Double predictedPoint = predictPoint(myRobot, e, bulletVelocity, enemyX, enemyY);
 
 		return predictedPoint;

@@ -8,12 +8,12 @@ import robocode.ScannedRobotEvent;
 public class AlcOne extends MyRobot {
 
 	PatternBot enemy = new PatternBot();
+	Game game = new Game();
 	long lastEnemySeen = 0;
 	
-	
 	public void run() {
-
-		this.setTurnRadarRightRadians(Double.POSITIVE_INFINITY);
+		
+		firstRun(game);
 
 		// Si pierde al enemigo de vista
 		if ((getTime() - lastEnemySeen) >= 5) {
@@ -32,8 +32,9 @@ public class AlcOne extends MyRobot {
 		lastEnemySeen = this.getTime();
 		
 		this.aimRadarRadians(Util.getAbsoluteBearingToPointRadians(enemy.getX(), enemy.getY(), this.getX(), this.getY()));
-		// this.aimRadarDegrees(Util.getAbsoluteBearingToPointDegree(enemy.getX(), enemy.getY(), this.getX(), this.getY()));
 
+		Gun.main(this, enemy);
+		
 	}
 
 }

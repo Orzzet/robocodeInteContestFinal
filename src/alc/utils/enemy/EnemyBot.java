@@ -10,13 +10,8 @@ public class EnemyBot {
 
 	private double myRobotX;
 	private double myRobotY;
-	
-	private double distance;
-	private double velocity = 0;
-	private double energy = 0;
-	double time;
-	private double headingRadians;
-	private double bearingRadians;
+
+	private ScannedRobotEvent scannedRobot = null;
 
 	private double absoluteBearingRadians;
 	private double energyChange;
@@ -27,20 +22,15 @@ public class EnemyBot {
 
 	public void setEverything(ScannedRobotEvent e, AdvancedRobot r) {
 
-		// Tengo que cambiar todo a radianes, me voy a ahorrar muchas cosas
-		// /(e.getTime() - time) para la media
-		turnRate = e.getHeadingRadians() - headingRadians;
-		energyChange = e.getEnergy() - energy;
+		if (scannedRobot != null) {
+			turnRate = e.getHeadingRadians() - getHeadingRadians();
+			energyChange = e.getEnergy() - getEnergy();
+		}
+		scannedRobot = e;
 
 		myRobotX = r.getX();
 		myRobotY = r.getY();
-		
-		bearingRadians = e.getBearingRadians();
-		headingRadians = e.getHeadingRadians();
-		distance = e.getDistance();
-		energy = e.getEnergy();
-		velocity = e.getVelocity();
-		time = e.getTime();
+
 		setAbsoluteBearingRadians(r.getHeadingRadians(), e.getBearingRadians());
 		setPosition();
 
@@ -52,24 +42,24 @@ public class EnemyBot {
 
 	public void setPosition() {
 
-		x = myRobotX + (distance * Math.sin(absoluteBearingRadians));
-		y = myRobotY + (distance * Math.cos(absoluteBearingRadians));
-		
+		x = myRobotX + (getDistance() * Math.sin(absoluteBearingRadians));
+		y = myRobotY + (getDistance() * Math.cos(absoluteBearingRadians));
+
 	}
 
-	public Point2D.Double getPosition(){
+	public Point2D.Double getPosition() {
 		return new Point2D.Double(getX(), getY());
 	}
-	
+
 	public Point2D.Double getNextPosition() {
-		double nextX = x + velocity * Math.sin(headingRadians + turnRate);
-		double nextY = y + velocity * Math.cos(headingRadians + turnRate);
+		double nextX = x + getVelocity() * Math.sin(getHeadingRadians() + turnRate);
+		double nextY = y + getVelocity() * Math.cos(getHeadingRadians() + turnRate);
 
 		return new Point2D.Double(nextX, nextY);
 	}
-	
+
 	public double getBearingRadians() {
-		return bearingRadians;
+		return scannedRobot.getBearingRadians();
 	}
 
 	public double getEnergyChange() {
@@ -77,15 +67,15 @@ public class EnemyBot {
 	}
 
 	public double getDistance() {
-		return distance;
+		return scannedRobot.getDistance();
 	}
 
 	public double getHeadingRadians() {
-		return headingRadians;
+		return scannedRobot.getHeadingRadians();
 	}
 
 	public double getVelocity() {
-		return velocity;
+		return scannedRobot.getVelocity();
 	}
 
 	public double getTurnRate() {
@@ -93,14 +83,18 @@ public class EnemyBot {
 	}
 
 	public double getEnergy() {
-		return energy;
+		return scannedRobot.getEnergy();
 	}
-	
-	public double getX(){
+
+	public double getX() {
 		return x;
 	}
-	
-	public double getY(){
+
+	public double getY() {
 		return y;
+	}
+
+	public ScannedRobotEvent getScannedRobot() {
+		return scannedRobot;
 	}
 }
