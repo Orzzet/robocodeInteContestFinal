@@ -97,4 +97,8 @@ public class EnemyBot {
 	public ScannedRobotEvent getScannedRobot() {
 		return scannedRobot;
 	}
+	
+	public double getAbsoluteBearingRadians(){
+		return absoluteBearingRadians;
+	}
 }

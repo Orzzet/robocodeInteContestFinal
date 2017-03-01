@@ -3,10 +3,14 @@ package alc.utils;
 import java.awt.geom.Rectangle2D;
 
 import robocode.AdvancedRobot;
+import robocode.SkippedTurnEvent;
 import robocode.util.Utils;
 
 public class MyRobot extends AdvancedRobot {
-
+	
+	protected int hasShoot = 0;
+	protected int enemyReceivedShot = 0;
+	
 	protected void firstRun(MyGame game) {
 		game.setBattlefield(new Rectangle2D.Double(18, 18, getBattleFieldWidth() - 36, getBattleFieldHeight() - 36));
 		game.setInnerBattlefield(new Rectangle2D.Double(getBattleFieldWidth() / 3, getBattleFieldHeight() / 3,
@@ -36,6 +40,11 @@ public class MyRobot extends AdvancedRobot {
 		// Apunta el radar al ángulo señalado
 		this.setTurnRadarRightRadians(
 				Utils.normalRelativeAngle(absoluteBearingRadians - this.getRadarHeadingRadians()));
+	}
+	
+	@Override
+	public void onSkippedTurn(SkippedTurnEvent event) {
+		System.out.println("Se ha saltado el turno: " + event.getTime());
 	}
 
 }

@@ -17,10 +17,11 @@ public class PatternTargetting {
 	private static double[][] recentMovements;
 
 	/**
-	 * precision -> número de movimientos a tener en cuenta en el patrón
+	 * precision -> número de movimientos a tener en cuenta en el patrón factors
+	 * -> número de factores a tener en cuenta para el patrón
 	 */
 	public static Point2D.Double pattern(Robot myRobot, double bulletVelocity, int precision, ScannedRobotEvent e,
-			double enemyX, double enemyY, double[][] enemyPastMovements, int enemyPastMovementsIndex) {
+			double enemyX, double enemyY, double[][] enemyPastMovements, int enemyPastMovementsIndex, int factors) {
 
 		pastMovements = enemyPastMovements;
 		pastMovementsIndex = enemyPastMovementsIndex;
@@ -29,60 +30,18 @@ public class PatternTargetting {
 		predictionBeginIndex = 0;
 
 		// Guarda los últimos movimientos que ha realizado el robot enemigo
-		recentMovements = saveRecentMovements(precision);
+		recentMovements = saveRecentMovements(precision, factors);
 
 		// Compara los últimos movimientos con los realizados durante la partida
 		// y devuelve el índice a partir del cual va a realizar los nuevos
 		// movimientos
-		predictionBeginIndex = fetchSimilarPatron(precision);
+		predictionBeginIndex = fetchSimilarPatron(precision, factors);
 
-		// Predice el punto en el que va a estar el enemigo teniendo en cuenta la velocidad de la bala
+		// Predice el punto en el que va a estar el enemigo teniendo en cuenta
+		// la velocidad de la bala
 		Point2D.Double predictedPoint = predictPoint(myRobot, e, bulletVelocity, enemyX, enemyY);
 
 		return predictedPoint;
-	}
-
-	/**
-	 * Se comparan los últimos "precision" movimientos con la suma de las
-	 * diferencias de todas las secuencias de "precision" movimientos en los
-	 * movimientos anteriores. Acabo de aprender a usar labels. Mola.
-	 * 
-	 * @param precision
-	 * @return
-	 */
-	private static int fetchSimilarPatron(int precision) {
-
-		int predictionBeginIndex = 0;
-
-		outerloop: for (int i = 0; i < pastMovements.length; i++) {
-
-			int k = Util.normalizeArrayIndex(i, pastMovements.length);
-
-			// Compara "precision" movimientos consecutivos si k no apunta al
-			// movimiento reciente.
-			if (!(k > pastMovementsIndex - precision && k < pastMovementsIndex)) {
-				double currentDifference = 0;
-
-				for (int j = 0; j < precision; j++) {
-					int kjNormalized = Util.normalizeArrayIndex(k + j, pastMovements.length);
-					currentDifference += Math.abs(pastMovements[kjNormalized][0] - recentMovements[j][0])
-							+ Math.abs(pastMovements[kjNormalized][1] - recentMovements[j][1]);
-				}
-
-				if (currentDifference < minDifferenceValue) {
-					minDifferenceValue = currentDifference;
-					// Guarda el índice con la primera posición que se usará
-					// para preveer el movimiento. También hay que normalizarlo
-					// para evitar OOB exception
-					predictionBeginIndex = Util.normalizeArrayIndex(k + precision, pastMovements.length);
-
-					if (minDifferenceValue == 0) {
-						break outerloop;
-					}
-				}
-			}
-		}
-		return predictionBeginIndex;
 	}
 
 	/**
@@ -92,9 +51,9 @@ public class PatternTargetting {
 	 * @return
 	 */
 
-	private static double[][] saveRecentMovements(int precision) {
+	private static double[][] saveRecentMovements(int precision, int factors) {
 
-		double[][] recentMovements = new double[precision][2];
+		double[][] recentMovements = new double[precision][factors];
 
 		for (int i = pastMovementsIndex - precision; i < pastMovementsIndex; i++) {
 
@@ -105,10 +64,58 @@ public class PatternTargetting {
 			// luego usarlo como índice.
 			int k2 = Util.normalizeArrayIndex(k - (pastMovementsIndex - precision), pastMovements.length);
 
-			recentMovements[k2][0] = pastMovements[k][0];
-			recentMovements[k2][1] = pastMovements[k][1];
+			for (int j = 0; j < factors; j++) {
+				recentMovements[k2][j] = pastMovements[k][j];
+			}
 		}
 		return recentMovements;
+	}
+
+	/**
+	 * Se comparan los últimos "precision" movimientos con la suma de las
+	 * diferencias de todas las secuencias de "precision" movimientos en los
+	 * movimientos anteriores. Acabo de aprender a usar labels. Mola.
+	 * 
+	 * @param precision
+	 * @return
+	 */
+	private static int fetchSimilarPatron(int precision, int factors) {
+
+		int predictionBeginIndex = 0;
+
+		// Recorre todas las posiciones de pastMovements (En paquetes de
+		// [precision] movimientos
+		outerloop: for (int i = 0; i < pastMovements.length; i++) {
+
+			int iNorm = Util.normalizeArrayIndex(i, pastMovements.length);
+
+			// Compara [precision] movimientos consecutivos siempre que iNorm no
+			// apunte a los movimientos recientes.
+			if (!(iNorm > pastMovementsIndex - precision && iNorm < pastMovementsIndex)) {
+				double currentDifference = 0;
+				for (int j = 0; j < precision; j++) {
+
+					// Normaliza el índice resultado de la suma iNorm + j
+					int ijNormalized = Util.normalizeArrayIndex(iNorm + j, pastMovements.length);
+
+					// La diferencia entre el patrón reciente y el obtenido se calcula teniendo en cuenta todos los
+					// [factors]
+					for (int k = 0; k < factors; k++) {
+						currentDifference += Math.abs(pastMovements[ijNormalized][k] - recentMovements[j][k]);
+					}
+				}
+
+				if (currentDifference < minDifferenceValue) {
+					minDifferenceValue = currentDifference;
+					predictionBeginIndex = Util.normalizeArrayIndex(iNorm + precision, pastMovements.length);
+
+					if (minDifferenceValue == 0) {
+						break outerloop;
+					}
+				}
+			}
+		}
+		return predictionBeginIndex;
 	}
 
 	/**

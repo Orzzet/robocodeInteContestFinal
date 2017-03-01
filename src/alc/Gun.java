@@ -40,36 +40,42 @@ public class Gun {
 			r.setFire(bulletFirepower);
 			bulletsMissed++;
 		}
-		
+
 		switch (weaponType) {
 		case CIRCULAR:
 			circular(r, enemy, bulletVelocity);
 			break;
 		case PATTERN:
-			pattern(r, enemy, bulletVelocity, 15);
+			pattern(r, enemy, bulletVelocity, 10);
 			break;
 		}
-		
+
 		fireTime = r.getTime() + 1;
 
 	}
 
 	private static void circular(MyRobot r, EnemyBot enemy, double bulletVelocity) {
-		Point2D.Double predictedPos = SimpleTargetting.circular(bulletVelocity, r.getX(), r.getY(), enemy.getScannedRobot(), enemy.getX(), enemy.getY(), enemy.getTurnRate());
+		Point2D.Double predictedPos = SimpleTargetting.circular(bulletVelocity, r.getX(), r.getY(),
+				enemy.getScannedRobot(), enemy.getX(), enemy.getY(), enemy.getTurnRate());
 		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
 		/*
-		if(bulletsMissed > 3 && enemy.getHasEnoughData()){
-			weaponType = Weapon.PATTERN;
+		 * if(bulletsMissed > 3 && enemy.getHasEnoughData()){ weaponType =
+		 * Weapon.PATTERN; }
+		 */
+	}
+
+	private static void pattern(MyRobot r, PatternBot enemy, double bulletVelocity, int precision) {
+		Point2D.Double predictedPos = PatternTargetting.pattern(r, bulletVelocity, precision, enemy.getScannedRobot(),
+				enemy.getX(), enemy.getY(), enemy.getPastMovements(), enemy.getPastMovementsIndex(), 2);
+		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
+		/*
+		if (bulletsMissed > 4) {
+			weaponType = Weapon.CIRCULAR;
 		}
 		*/
 	}
 	
-	private static void pattern(MyRobot r, PatternBot enemy, double bulletVelocity, int precision) {
-		Point2D.Double predictedPos = PatternTargetting.pattern(r, bulletVelocity, precision, enemy.getScannedRobot(), enemy.getX(), enemy.getY(), enemy.getPastMovements(), enemy.getPastMovementsIndex());
-		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
-		if(bulletsMissed > 4){
-			weaponType = Weapon.CIRCULAR;
-		}
+	public void resetBulletsMissed(){
+		bulletsMissed = 0;
 	}
-	
 }

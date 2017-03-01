@@ -30,11 +30,11 @@ public class AlcOne extends MyRobot {
 		enemy.setEverything(e, this);
 
 		lastEnemySeen = this.getTime();
-		
+
 		this.aimRadarRadians(Util.getAbsoluteBearingToPointRadians(enemy.getX(), enemy.getY(), this.getX(), this.getY()));
 
 		Gun.main(this, enemy);
-		
+
 	}
 
 }
