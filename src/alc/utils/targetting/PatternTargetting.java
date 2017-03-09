@@ -50,8 +50,6 @@ public class PatternTargetting {
 		} else {
 			myRobot.setBulletColor(Color.YELLOW);
 		}
-
-		System.out.println(minDifferenceValue);
 		
 		// Predice el punto en el que va a estar el enemigo teniendo en cuenta
 		// la velocidad de la bala

@@ -5,26 +5,32 @@ import java.awt.geom.Point2D;
 
 import alc.utils.MyRobot;
 import alc.utils.Util;
-import alc.utils.enemy.EnemyBot;
 import alc.utils.enemy.PatternBot;
 import alc.utils.targetting.PatternTargetting;
 import alc.utils.targetting.SimpleTargetting;
+import robocode.BulletHitBulletEvent;
+import robocode.BulletHitEvent;
+import robocode.BulletMissedEvent;
 import robocode.Rules;
 
 public class Gun {
 
-	private static Weapon weaponType = Weapon.PATTERN;
+	private static Weapon weaponType = Weapon.CIRCULAR;
 	private static double enemyClose = 0;
 	private static int bulletsMissed = 0;
 	private static long fireTime = 0;
 
 	public static void main(MyRobot r, PatternBot enemy) {
 
-		weaponType = Weapon.PATTERN;
-
 		if (enemy.getDistance() <= 150) {
 			enemyClose = 1;
-			weaponType = Weapon.CIRCULAR;
+
+			if (enemy.getDistance() <= 50) {
+				weaponType = Weapon.HEAD;
+			} else {
+				weaponType = Weapon.CIRCULAR;
+			}
+
 		} else {
 			enemyClose = 0;
 		}
@@ -48,12 +54,14 @@ public class Gun {
 		// siguiente
 		if (fireTime == r.getTime() && r.getGunTurnRemaining() == 0 && r.getGunHeat() == 0) {
 			r.setFire(bulletFirepower);
-			bulletsMissed++;
 		}
 
 		switch (weaponType) {
 		case CIRCULAR:
 			circular(r, enemy, bulletVelocity);
+			break;
+		case HEAD:
+			head(r, enemy);
 			break;
 		case PATTERN:
 			pattern(r, enemy, bulletVelocity, 10);
@@ -65,29 +73,55 @@ public class Gun {
 
 	}
 
-	private static void circular(MyRobot r, EnemyBot enemy, double bulletVelocity) {
+	private static void head(MyRobot r, PatternBot enemy) {
+		r.setGunColor(Color.PINK);
+		r.setBulletColor(Color.PINK);
+		Point2D.Double predictedPos = SimpleTargetting.head(enemy.getX(), enemy.getY());
+		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
+		if (bulletsMissed > 4) {
+			weaponType = Weapon.PATTERN;
+			bulletsMissed = 0;
+		}
+
+	}
+
+	private static void circular(MyRobot r, PatternBot enemy, double bulletVelocity) {
 		r.setGunColor(Color.RED);
+		r.setBulletColor(Color.RED);
 		Point2D.Double predictedPos = SimpleTargetting.circular(bulletVelocity, r.getX(), r.getY(),
 				enemy.getScannedRobot(), enemy.getX(), enemy.getY(), enemy.getTurnRate());
 		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
-		/*
-		 * if(bulletsMissed > 3 && enemy.getHasEnoughData()){ weaponType =
-		 * Weapon.PATTERN; }
-		 */
+
+		if (bulletsMissed > 3 || enemy.getHasEnoughData()) {
+			weaponType = Weapon.PATTERN;
+			bulletsMissed = 0;
+		}
+
 	}
 
 	private static void pattern(MyRobot r, PatternBot enemy, double bulletVelocity, int precision) {
 		r.setGunColor(Color.GREEN);
+		r.setBulletColor(Color.GREEN);
 		Point2D.Double predictedPos = PatternTargetting.pattern(r, bulletVelocity, precision, enemy.getScannedRobot(),
 				enemy.getX(), enemy.getY(), enemy.getPastMovements(), enemy.getPastMovementsIndex(),
 				enemy.getTopMovementIndex(), 3);
 		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
-		/*
-		 * if (bulletsMissed > 4) { weaponType = Weapon.CIRCULAR; }
-		 */
+//		if (bulletsMissed > 5) {
+//			weaponType = Weapon.HEAD;
+//			bulletsMissed = 0;
+//		}
 	}
 
-	public void resetBulletsMissed() {
+	public static void onBulletMissed(BulletMissedEvent event){
+		bulletsMissed += 1;
+	}
+	
+	public static void onBulletHit(BulletHitEvent event) {
+		// weaponHits.put(weaponType, weaponHits.get(weaponType) + 1);
 		bulletsMissed = 0;
+	}
+
+	public static void onBulletHitBullet(BulletHitBulletEvent event) {
+		bulletsMissed -= 1;
 	}
 }

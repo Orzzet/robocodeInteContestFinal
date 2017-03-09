@@ -1,6 +1,6 @@
 package alc;
 
 public enum Weapon {
-	CIRCULAR, PATTERN
+	CIRCULAR, PATTERN, HEAD
 
 }

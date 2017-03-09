@@ -44,5 +44,12 @@ public class SimpleTargetting {
 		return new Point2D.Double(x, y);
 
 	}
+	
+	
+	public static Point2D.Double head(double enemyX, double enemyY){
+		
+		return new Point2D.Double(enemyX, enemyY);
+		
+	}
 
 }
