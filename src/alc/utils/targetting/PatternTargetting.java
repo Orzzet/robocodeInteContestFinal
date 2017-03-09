@@ -1,5 +1,6 @@
 package alc.utils.targetting;
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
 
 import alc.utils.Util;
@@ -10,6 +11,7 @@ public class PatternTargetting {
 
 	private static double[][] pastMovements;
 	private static int pastMovementsIndex;
+	private static int topMovementIndex;
 
 	private static double minDifferenceValue;
 	private static int predictionBeginIndex;
@@ -21,10 +23,16 @@ public class PatternTargetting {
 	 * -> número de factores a tener en cuenta para el patrón
 	 */
 	public static Point2D.Double pattern(Robot myRobot, double bulletVelocity, int precision, ScannedRobotEvent e,
-			double enemyX, double enemyY, double[][] enemyPastMovements, int enemyPastMovementsIndex, int factors) {
+			double enemyX, double enemyY, double[][] enemyPastMovements, int enemyPastMovementsIndex,
+			int enemyTopMovementIndex, int factors) {
 
+		if(pastMovementsIndex > 495){
+			assert true;
+		}
+		
 		pastMovements = enemyPastMovements;
 		pastMovementsIndex = enemyPastMovementsIndex;
+		topMovementIndex = enemyTopMovementIndex;
 
 		minDifferenceValue = 1000000;
 		predictionBeginIndex = 0;
@@ -37,6 +45,14 @@ public class PatternTargetting {
 		// movimientos
 		predictionBeginIndex = fetchSimilarPatron(precision, factors);
 
+		if (minDifferenceValue == 0) {
+			myRobot.setBulletColor(Color.GREEN);
+		} else {
+			myRobot.setBulletColor(Color.YELLOW);
+		}
+
+		System.out.println(minDifferenceValue);
+		
 		// Predice el punto en el que va a estar el enemigo teniendo en cuenta
 		// la velocidad de la bala
 		Point2D.Double predictedPoint = predictPoint(myRobot, e, bulletVelocity, enemyX, enemyY);
@@ -81,33 +97,36 @@ public class PatternTargetting {
 	 */
 	private static int fetchSimilarPatron(int precision, int factors) {
 
+		// Variable donde se guarda el índice de la primera posición predicha del enemigo.
 		int predictionBeginIndex = 0;
 
 		// Recorre todas las posiciones de pastMovements (En paquetes de
-		// [precision] movimientos
+		// [precision] movimientos)
 		outerloop: for (int i = 0; i < pastMovements.length; i++) {
 
-			int iNorm = Util.normalizeArrayIndex(i, pastMovements.length);
-
-			// Compara [precision] movimientos consecutivos siempre que iNorm no
+			// Compara [precision] movimientos consecutivos siempre que i no
 			// apunte a los movimientos recientes.
-			if (!(iNorm > pastMovementsIndex - precision && iNorm < pastMovementsIndex)) {
+			if (!(i + precision >= (pastMovementsIndex - precision) && i < pastMovementsIndex)) {
 				double currentDifference = 0;
 				for (int j = 0; j < precision; j++) {
 
-					// Normaliza el índice resultado de la suma iNorm + j
-					int ijNormalized = Util.normalizeArrayIndex(iNorm + j, pastMovements.length);
+					// Normaliza el índice resultado de la suma i + j
+					int ijNormalized = Util.normalizeArrayIndex(i + j, pastMovements.length);
 
-					// La diferencia entre el patrón reciente y el obtenido se calcula teniendo en cuenta todos los
-					// [factors]
-					for (int k = 0; k < factors; k++) {
+					if (ijNormalized > topMovementIndex) {
+						break outerloop;
+					}
+
+					// La diferencia entre el patrón reciente y el obtenido se
+					// calcula teniendo en cuenta todos los [factors]
+					for (int k = 1; k < factors; k++) {
 						currentDifference += Math.abs(pastMovements[ijNormalized][k] - recentMovements[j][k]);
 					}
 				}
 
 				if (currentDifference < minDifferenceValue) {
 					minDifferenceValue = currentDifference;
-					predictionBeginIndex = Util.normalizeArrayIndex(iNorm + precision, pastMovements.length);
+					predictionBeginIndex = Util.normalizeArrayIndex(i + precision, pastMovements.length);
 
 					if (minDifferenceValue == 0) {
 						break outerloop;

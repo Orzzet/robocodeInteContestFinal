@@ -1,5 +1,6 @@
 package alc;
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
 
 import alc.utils.MyRobot;
@@ -18,8 +19,12 @@ public class Gun {
 	private static long fireTime = 0;
 
 	public static void main(MyRobot r, PatternBot enemy) {
+
+		weaponType = Weapon.PATTERN;
+
 		if (enemy.getDistance() <= 150) {
 			enemyClose = 1;
+			weaponType = Weapon.CIRCULAR;
 		} else {
 			enemyClose = 0;
 		}
@@ -29,6 +34,11 @@ public class Gun {
 		// Si se puede matar al enemigo con menos energía, mejor.
 		if (enemy.getEnergy() < (4 * bulletFirepower + 2 * (bulletFirepower - 1))) {
 			bulletFirepower = (enemy.getEnergy() + 2) / 6 + 0.1;
+		}
+
+		// Si queda poca energía, se usa menos para los disparos.
+		if (r.getEnergy() <= 3) {
+			bulletFirepower = r.getEnergy() / 3;
 		}
 
 		double bulletVelocity = Rules.getBulletSpeed(bulletFirepower);
@@ -50,11 +60,13 @@ public class Gun {
 			break;
 		}
 
+		// Listo para disparar en el tick siguiente
 		fireTime = r.getTime() + 1;
 
 	}
 
 	private static void circular(MyRobot r, EnemyBot enemy, double bulletVelocity) {
+		r.setGunColor(Color.RED);
 		Point2D.Double predictedPos = SimpleTargetting.circular(bulletVelocity, r.getX(), r.getY(),
 				enemy.getScannedRobot(), enemy.getX(), enemy.getY(), enemy.getTurnRate());
 		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
@@ -65,17 +77,17 @@ public class Gun {
 	}
 
 	private static void pattern(MyRobot r, PatternBot enemy, double bulletVelocity, int precision) {
+		r.setGunColor(Color.GREEN);
 		Point2D.Double predictedPos = PatternTargetting.pattern(r, bulletVelocity, precision, enemy.getScannedRobot(),
-				enemy.getX(), enemy.getY(), enemy.getPastMovements(), enemy.getPastMovementsIndex(), 2);
+				enemy.getX(), enemy.getY(), enemy.getPastMovements(), enemy.getPastMovementsIndex(),
+				enemy.getTopMovementIndex(), 3);
 		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
 		/*
-		if (bulletsMissed > 4) {
-			weaponType = Weapon.CIRCULAR;
-		}
-		*/
+		 * if (bulletsMissed > 4) { weaponType = Weapon.CIRCULAR; }
+		 */
 	}
-	
-	public void resetBulletsMissed(){
+
+	public void resetBulletsMissed() {
 		bulletsMissed = 0;
 	}
 }
