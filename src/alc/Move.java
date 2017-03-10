@@ -6,14 +6,12 @@ import alc.utils.MyGame;
 import alc.utils.MyRobot;
 import alc.utils.Util;
 import alc.utils.enemy.EnemyBot;
-import robocode.HitByBulletEvent;
 import robocode.HitWallEvent;
 import robocode.util.Utils;
 
 public class Move {
 
 	private static double orientation = 1;
-	private static long ticksLastReceivedHit = 0;
 	private static long ticksLastWallHit;
 	private static Movement movementType = Movement.ORBIT2;
 	private static int recentWallHits = 0;
@@ -56,12 +54,6 @@ public class Move {
 		if (r.getTurnRemainingRadians() == 0) {
 			r.setAhead(100);
 		}
-	}
-
-	public static void hitByBullet(HitByBulletEvent e) {
-
-		ticksLastReceivedHit = e.getTime();
-
 	}
 
 	private static void orbit1(MyRobot r, EnemyBot enemy, double distance) {

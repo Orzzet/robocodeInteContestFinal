@@ -6,7 +6,6 @@ import alc.utils.enemy.PatternBot;
 import robocode.BulletHitBulletEvent;
 import robocode.BulletHitEvent;
 import robocode.BulletMissedEvent;
-import robocode.HitByBulletEvent;
 import robocode.HitWallEvent;
 import robocode.ScannedRobotEvent;
 
@@ -52,10 +51,6 @@ public class AlcOne extends MyRobot {
 		 * 0.5236 * FORWARD * (e.getDistance() > 250 ? 1 : -1));
 		 */
 
-	}
-
-	public void onHitByBullet(HitByBulletEvent e) {
-		Move.hitByBullet(e);
 	}
 
 	@Override

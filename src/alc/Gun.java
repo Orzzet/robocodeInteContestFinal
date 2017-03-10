@@ -22,7 +22,7 @@ public class Gun {
 
 	public static void main(MyRobot r, PatternBot enemy) {
 
-		if (enemy.getDistance() <= 150) {
+		if (enemy.getDistance() <= 100) {
 			enemyClose = 1;
 
 			if (enemy.getDistance() <= 50) {
@@ -44,7 +44,7 @@ public class Gun {
 
 		// Si queda poca energía, se usa menos para los disparos.
 		if (r.getEnergy() <= 3) {
-			bulletFirepower = r.getEnergy() / 3;
+			bulletFirepower = r.getEnergy() / 4;
 		}
 
 		double bulletVelocity = Rules.getBulletSpeed(bulletFirepower);
@@ -78,7 +78,7 @@ public class Gun {
 		r.setBulletColor(Color.PINK);
 		Point2D.Double predictedPos = SimpleTargetting.head(enemy.getX(), enemy.getY());
 		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
-		if (bulletsMissed > 4) {
+		if (bulletsMissed >= 4 || enemy.getHasEnoughData()) {
 			weaponType = Weapon.PATTERN;
 			bulletsMissed = 0;
 		}
@@ -92,7 +92,7 @@ public class Gun {
 				enemy.getScannedRobot(), enemy.getX(), enemy.getY(), enemy.getTurnRate());
 		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
 
-		if (bulletsMissed > 3 || enemy.getHasEnoughData()) {
+		if (bulletsMissed >= 3 && enemy.getHasEnoughData()) {
 			weaponType = Weapon.PATTERN;
 			bulletsMissed = 0;
 		}
@@ -106,7 +106,7 @@ public class Gun {
 				enemy.getX(), enemy.getY(), enemy.getPastMovements(), enemy.getPastMovementsIndex(),
 				enemy.getTopMovementIndex(), 3);
 		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
-//		if (bulletsMissed > 5) {
+//		if (bulletsMissed >= 6) {
 //			weaponType = Weapon.HEAD;
 //			bulletsMissed = 0;
 //		}
