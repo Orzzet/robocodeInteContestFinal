@@ -146,7 +146,7 @@ public class PatternTargetting {
 	 * @param bulletVelocity
 	 * @param enemyX
 	 * @param enemyY
-	 * @return
+	 * @return Punto donde se va a encontrar el robot enemigo teniendo en cuenta que nuestra bala puede llegarle
 	 */
 	private static Point2D.Double predictPoint(Robot myRobot, ScannedRobotEvent e, double bulletVelocity, double enemyX,
 			double enemyY) {
@@ -160,9 +160,9 @@ public class PatternTargetting {
 
 		for (int i = 0; bulletVelocity * i < newDistance; i++) {
 			int normalizedIndex = Util.normalizeArrayIndex(predictionBeginIndex, pastMovements.length);
+			heading += pastMovements[normalizedIndex][0];
 			x += pastMovements[normalizedIndex][1] * Math.sin(heading);
 			y += pastMovements[normalizedIndex][1] * Math.cos(heading);
-			heading += pastMovements[normalizedIndex][0];
 			newDistance = Point2D.distance(x0, y0, x, y);
 			predictionBeginIndex++;
 		}

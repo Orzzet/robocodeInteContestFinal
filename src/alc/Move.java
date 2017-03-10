@@ -72,7 +72,7 @@ public class Move {
 
 	private static void orbit2(MyRobot r, EnemyBot enemy, double distance) {
 
-		r.setBodyColor(Color.ORANGE);
+		r.setBodyColor(Color.BLUE);
 		long time = r.getTime();
 		int enemyFar = 1;
 		if (r.getDistanceRemaining() == 0) {
