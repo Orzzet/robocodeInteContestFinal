@@ -18,7 +18,7 @@ public class MyRobot extends AdvancedRobot {
 	protected void firstRun(MyGame game) {
 		game.setBattlefield(new Rectangle2D.Double(18, 18, getBattleFieldWidth() - 36, getBattleFieldHeight() - 36));
 		game.setInnerBattlefield(new Rectangle2D.Double(getBattleFieldWidth() * 1 / 10, getBattleFieldHeight() * 1 / 10,
-				getBattleFieldWidth() * 1 / 10, getBattleFieldHeight() * 1 / 10));
+				getBattleFieldWidth() * 9 / 10, getBattleFieldHeight() * 9 / 10));
 
 		this.setAdjustRadarForGunTurn(true);
 		this.setAdjustGunForRobotTurn(true);
