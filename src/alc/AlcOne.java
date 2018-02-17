@@ -24,6 +24,7 @@ public class AlcOne extends MyRobot {
 
 		this.setTurnRadarRightRadians(Double.POSITIVE_INFINITY);
 
+		// Siempre scanea el robot enemigo, no se puede escapar con esto.
 		while (true) {
 			// Si pierde al enemigo de vista
 			if ((getTime() - lastEnemySeen) >= 5) {
@@ -33,6 +34,7 @@ public class AlcOne extends MyRobot {
 		}
 	}
 
+	// Cada vez que ha escaneado con exito al robot enemigo (todos los turnos en 1v1), realiza todas las acciones.
 	public void onScannedRobot(ScannedRobotEvent e) {
 
 		enemy.setEverything(e, this);
@@ -44,12 +46,6 @@ public class AlcOne extends MyRobot {
 
 		Gun.main(this, enemy);
 		Move.main(this, enemy);
-
-		/*
-		 * if (getDistanceRemaining() == 0) { FORWARD = -FORWARD; setAhead(185 *
-		 * FORWARD); } setTurnRightRadians(e.getBearingRadians() + Math.PI / 2 -
-		 * 0.5236 * FORWARD * (e.getDistance() > 250 ? 1 : -1));
-		 */
 
 	}
 

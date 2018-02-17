@@ -49,7 +49,7 @@ public class Gun {
 
 		double bulletVelocity = Rules.getBulletSpeed(bulletFirepower);
 
-		// En el motor del juego las balas se disparan un paso antes de mover el
+		// En el motor del juego las balas se disparan antes de mover el
 		// cañón, por lo que tenemos que apuntar un turno y disparar el
 		// siguiente
 		if (fireTime == r.getTime() && r.getGunTurnRemaining() == 0 && r.getGunHeat() == 0) {
@@ -73,6 +73,7 @@ public class Gun {
 
 	}
 
+	// Dispara a la posición actual del robot. Solo valido para cuando el robot esta muy cerca.
 	private static void head(MyRobot r, PatternBot enemy) {
 		r.setGunColor(Color.PINK);
 		r.setBulletColor(Color.PINK);
@@ -85,11 +86,14 @@ public class Gun {
 
 	}
 
+	// Dispara a una posicion futura del robot. Supone que mantiene su velocidad angular.
 	private static void circular(MyRobot r, PatternBot enemy, double bulletVelocity) {
 		r.setGunColor(Color.RED);
 		r.setBulletColor(Color.RED);
+		
 		Point2D.Double predictedPos = SimpleTargetting.circular(bulletVelocity, r.getX(), r.getY(),
 				enemy.getScannedRobot(), enemy.getX(), enemy.getY(), enemy.getTurnRate());
+		
 		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
 
 		if (bulletsMissed >= 3 && enemy.getHasEnoughData()) {
@@ -98,18 +102,18 @@ public class Gun {
 		}
 
 	}
-
+	
+	// Dispara a una posición futura del robot. Se basa en datos recolectados durante la partida.
 	private static void pattern(MyRobot r, PatternBot enemy, double bulletVelocity, int precision) {
 		r.setGunColor(Color.GREEN);
 		r.setBulletColor(Color.GREEN);
+		
 		Point2D.Double predictedPos = PatternTargetting.pattern(r, bulletVelocity, precision, enemy.getScannedRobot(),
 				enemy.getX(), enemy.getY(), enemy.getPastMovements(), enemy.getPastMovementsIndex(),
 				enemy.getTopMovementIndex(), 3);
+		
 		r.aimGunRadians(Util.getAbsoluteBearingToPointRadians(predictedPos, r.getX(), r.getY()));
-//		if (bulletsMissed >= 6) {
-//			weaponType = Weapon.HEAD;
-//			bulletsMissed = 0;
-//		}
+		
 	}
 
 	public static void onBulletMissed(BulletMissedEvent event){
@@ -117,7 +121,6 @@ public class Gun {
 	}
 	
 	public static void onBulletHit(BulletHitEvent event) {
-		// weaponHits.put(weaponType, weaponHits.get(weaponType) + 1);
 		bulletsMissed = 0;
 	}
 

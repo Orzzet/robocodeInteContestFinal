@@ -19,8 +19,8 @@ public class PatternTargetting {
 	private static double[][] recentMovements;
 
 	/**
-	 * precision -> número de movimientos a tener en cuenta en el patrón factors
-	 * -> número de factores a tener en cuenta para el patrón
+	 * precision -> número de movimientos a tener en cuenta en el patrón 
+	 * factors -> número de factores a tener en cuenta para el patrón
 	 */
 	public static Point2D.Double pattern(Robot myRobot, double bulletVelocity, int precision, ScannedRobotEvent e,
 			double enemyX, double enemyY, double[][] enemyPastMovements, int enemyPastMovementsIndex,

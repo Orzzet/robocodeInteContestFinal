@@ -56,6 +56,8 @@ public class Move {
 		}
 	}
 
+	// Orbita alrededor del enemigo dibujando un circulo.
+		
 	private static void orbit1(MyRobot r, EnemyBot enemy, double distance) {
 		r.setBodyColor(Color.CYAN);
 		int enemyFar = 1;
@@ -69,6 +71,9 @@ public class Move {
 		}
 		r.setTurnRightRadians(enemy.getBearingRadians() + Math.PI / 2 - 0.52 * orientation * enemyFar);
 	}
+	
+	// Orbita alrededor del enemigo con una funcion senoidal. 
+	// Es mejor que el circulo ya que tiene mas exito en evitar que el rival preveea nuestra posicion.
 
 	private static void orbit2(MyRobot r, EnemyBot enemy, double distance) {
 

@@ -14,7 +14,7 @@ public class SimpleTargetting {
 	 * @param enemyInitialPosition
 	 *            - Posición inicial del enemigo
 	 * @param enemyTurnRate
-	 *            - La diferencia de heading de este tick y el anterior del
+	 *            - La diferencia de heading entre este tick y el anterior del
 	 *            robot enemigo
 	 * @return - Point2D.Double con la posición predicha del enemigo
 	 */
